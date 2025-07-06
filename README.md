@@ -10,16 +10,19 @@ A modern portfolio website built with the MENN stack (MongoDB, Express.js, Next.
    cd portfolio
 
 2. **Frontend Setup (client)**
+    ```bash
     cd client
     npm install
     npm run dev
 
 3. **Backend Setup (server)**
+    ```bash
     cd server
     npm install
     npm run dev
 
 4. **Environment VariablesCreate a .env file in the server directory with:**
+    ```bash
     MONGO_URI=mongodb://localhost/portfolio
     JWT_SECRET=your_jwt_secret
     CLOUDINARY_CLOUD_NAME=your_cloud_name
