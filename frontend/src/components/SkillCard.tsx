@@ -1,3 +1,5 @@
+'use client';
+
 import { Skill } from '../types';
 
 interface Props {

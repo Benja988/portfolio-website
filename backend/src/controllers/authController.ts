@@ -4,19 +4,21 @@ import jwt from 'jsonwebtoken';
 import { connectToDatabase } from '../lib/mongodb';
 import User from '../models/User';
 
-export const login = async (req: Request, res: Response) => {
+export const login = async (req: Request, res: Response): Promise<void> => {
   try {
     await connectToDatabase();
     const { email, password } = req.body;
 
     const user = await User.findOne({ email }).exec();
     if (!user) {
-      return res.status(401).json({ error: 'User not found' });
+      res.status(401).json({ error: 'User not found' });
+      return;
     }
 
     const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) {
-      return res.status(401).json({ error: 'Invalid password' });
+      res.status(401).json({ error: 'Invalid password' });
+      return;
     }
 
     const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET || 'your_jwt_secret', {

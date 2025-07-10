@@ -27,7 +27,7 @@ export default function Admin() {
 
     await fetch('http://localhost:5000/api/projects', {
       method: 'POST',
-      headers: { Authorization: `Bearer ${session.user.token}` },
+      headers: { Authorization: `Bearer ${(session.user as any).token}` },
       body: formData,
     });
     setProject({ title: '', description: '', techStack: '', image: null });
@@ -39,7 +39,7 @@ export default function Admin() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${session.user.token}`,
+        Authorization: `Bearer ${(session.user as any).token}`,
       },
       body: JSON.stringify(skill),
     });
