@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useState } from 'react';
 import ProjectCard from '../components/ProjectCard';
 import SkillCard from '../components/SkillCard';
@@ -9,8 +11,8 @@ export default function Home() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const projectsRes = await fetch('/api/projects');
-      const skillsRes = await fetch('/api/skills');
+      const projectsRes = await fetch('http://localhost:5000/api/projects');
+      const skillsRes = await fetch('http://localhost:5000/api/skills');
       setProjects(await projectsRes.json());
       setSkills(await skillsRes.json());
     };
@@ -23,7 +25,10 @@ export default function Home() {
       <section className="text-center py-16 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg">
         <h1 className="text-4xl md:text-5xl font-bold">Benjamin Okumu Okinyi</h1>
         <p className="text-xl mt-4">Software Engineer & Business Central Consultant</p>
-        <a href="https://www.linkedin.com/in/benjamin-okumu-b947802b8/" className="mt-6 inline-block bg-white text-blue-600 px-6 py-3 rounded-full font-semibold hover:bg-gray-100">
+        <a
+          href="https://www.linkedin.com/in/benjamin-okumu-b947802b8/"
+          className="mt-6 inline-block bg-white text-blue-600 px-6 py-3 rounded-full font-semibold hover:bg-gray-100"
+        >
           Connect on LinkedIn
         </a>
       </section>
@@ -103,7 +108,9 @@ export default function Home() {
       {/* Contact Section */}
       <section className="py-12 text-center">
         <h2 className="text-3xl font-bold mb-8">Get in Touch</h2>
-        <p className="text-lg text-gray-700">Email: <a href="mailto:okumub85@gmail.com" className="text-blue-600">okumub85@gmail.com</a></p>
+        <p className="text-lg text-gray-700">
+          Email: <a href="mailto:okumub85@gmail.com" className="text-blue-600">okumub85@gmail.com</a>
+        </p>
         <p className="text-lg text-gray-700">Phone: +254704479392</p>
         <p className="text-lg text-gray-700">Location: Nairobi, Kenya</p>
       </section>

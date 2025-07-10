@@ -1,16 +1,19 @@
+'use client';
+
 import { useSession } from 'next-auth/react';
 import { useState } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
+import { Project, Skill } from '../../types';
 
 export default function Admin() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [project, setProject] = useState({ title: '', description: '', techStack: '', image: '' });
+  const [project, setProject] = useState({ title: '', description: '', techStack: '', image: null as File | null });
   const [skill, setSkill] = useState({ name: '', category: '' });
 
   if (status === 'loading') return <p>Loading...</p>;
   if (!session) {
-    router.push('/api/auth/signin');
+    router.push('/auth/signin');
     return null;
   }
 
@@ -20,20 +23,24 @@ export default function Admin() {
     formData.append('title', project.title);
     formData.append('description', project.description);
     formData.append('techStack', project.techStack);
-    formData.append('image', project.image);
+    if (project.image) formData.append('image', project.image);
 
-    await fetch('/api/projects', {
+    await fetch('http://localhost:5000/api/projects', {
       method: 'POST',
+      headers: { Authorization: `Bearer ${session.user.token}` },
       body: formData,
     });
-    setProject({ title: '', description: '', techStack: '', image: '' });
+    setProject({ title: '', description: '', techStack: '', image: null });
   };
 
   const handleSkillSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await fetch('/api/skills', {
+    await fetch('http://localhost:5000/api/skills', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session.user.token}`,
+      },
       body: JSON.stringify(skill),
     });
     setSkill({ name: '', category: '' });
@@ -68,7 +75,7 @@ export default function Admin() {
             />
             <input
               type="file"
-              onChange={(e) => setProject({ ...project, image: e.target.files?.[0] as any })}
+              onChange={(e) => setProject({ ...project, image: e.target.files?.[0] || null })}
               className="w-full p-2 border rounded"
             />
             <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">

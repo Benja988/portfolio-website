@@ -6,7 +6,7 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
   if (!token) return res.status(401).json({ message: 'Unauthorized' });
 
   try {
-    jwt.verify(token, process.env.JWT_SECRET || 'secret');
+    jwt.verify(token, process.env.JWT_SECRET || 'your_jwt_secret');
     next();
   } catch (error) {
     res.status(401).json({ message: 'Invalid token' });

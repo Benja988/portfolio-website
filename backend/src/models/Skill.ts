@@ -1,8 +1,15 @@
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { Schema, Document, Model } from 'mongoose';
 
-const SkillSchema = new Schema({
-  name: { type: String, required: true },
-  category: { type: String, required: true },
+export interface ISkill extends Document {
+  name: string;
+  category: string;
+}
+
+const SkillSchema: Schema<ISkill> = new Schema({
+  name: { type: String, required: [true, 'Name is required'] },
+  category: { type: String, required: [true, 'Category is required'] },
 });
 
-export default mongoose.model('Skill', SkillSchema);
+const Skill: Model<ISkill> = mongoose.models.Skill || mongoose.model<ISkill>('Skill', SkillSchema);
+
+export default Skill;

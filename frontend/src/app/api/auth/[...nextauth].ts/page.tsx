@@ -1,12 +1,6 @@
-// app/api/auth/[...nextauth].ts
-
-import NextAuth, { NextAuthOptions, AuthOptions } from 'next-auth';
+import NextAuth, { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import bcrypt from 'bcryptjs';
-import { connectToDatabase } from '@/lib/mongodb'; // Adjust path based On your structure
-import User, { IUser } from '@/models/User'; // Adjust path, ensure Mongoose model
-import { MongoDBAdapter } from '@next-auth/mongodb-adapter';
-import mongoose from 'mongoose';
+import axios from 'axios';
 
 interface Credentials {
   email: string;
@@ -21,25 +15,22 @@ export const authOptions: NextAuthOptions = {
         email: { label: 'Email', type: 'text' },
         password: { label: 'Password', type: 'password' },
       },
-      async authorize(credentials: Credentials | undefined, req): Promise<any | null> {
+      async authorize(credentials: Credentials | undefined) {
         if (!credentials?.email || !credentials?.password) {
           throw new Error('Missing credentials');
         }
 
         try {
-          await connectToDatabase(); // Ensure connection is established
-          const user: IUser | null = await User.findOne({ email: credentials.email }).exec();
+          const response = await axios.post('http://localhost:5000/api/auth/login', {
+            email: credentials.email,
+            password: credentials.password,
+          });
 
-          if (!user) {
-            throw new Error('User not found');
+          const user = response.data;
+          if (user) {
+            return { id: user.id, name: user.name, email: user.email, token: user.token };
           }
-
-          const isValid = await bcrypt.compare(credentials.password, user.password);
-          if (!isValid) {
-            throw new Error('Invalid password');
-          }
-
-          return { id: user._id.toString(), name: user.name, email: user.email };
+          return null;
         } catch (error) {
           console.error('Auth error:', error);
           throw new Error('Authentication failed');
@@ -47,13 +38,12 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
-  adapter: MongoDBAdapter(Promise.resolve(mongoose.connection)), // Use MongoDB adapter
   pages: {
     signIn: '/auth/signin',
   },
   session: {
     strategy: 'jwt',
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 30 * 24 * 60 * 60,
   },
   jwt: {
     secret: process.env.JWT_SECRET || 'your_jwt_secret',
@@ -62,12 +52,14 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        token.token = user.token;
       }
       return token;
     },
     async session({ session, token }) {
       if (token.id) {
         session.user.id = token.id;
+        session.user.token = token.token;
       }
       return session;
     },

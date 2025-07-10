@@ -1,23 +1,24 @@
-// app/_app.tsx
-
-import '../styles/globals.css';
-import type { AppProps } from 'next/app';
+import './styles/globals.css';
 import { SessionProvider } from 'next-auth/react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import { ReactNode } from 'react';
 
-function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
+export const metadata = {
+  title: 'Benjamin Okumu Portfolio',
+  description: 'Portfolio of Benjamin Okumu, Software Engineer & Business Central Consultant',
+};
+
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <SessionProvider session={session}>
-      <div className="flex flex-col min-h-screen">
-        <Header />
-        <main className="flex-grow">
-          <Component {...pageProps} />
-        </main>
-        <Footer />
-      </div>
-    </SessionProvider>
+    <html lang="en">
+      <body className="flex flex-col min-h-screen">
+        <SessionProvider>
+          <Header />
+          <main className="flex-grow">{children}</main>
+          <Footer />
+        </SessionProvider>
+      </body>
+    </html>
   );
 }
-
-export default MyApp;
