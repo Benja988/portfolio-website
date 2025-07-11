@@ -7,20 +7,34 @@ import { Project, Skill } from '../types';
 import AnimatedSection from '../components/AnimatedSection';
 import GradientButton from '../components/GradientButton';
 import ModernCard from '../components/ModernCard';
+import useDarkMode from '../hooks/useDarkMode';
+
+const SectionDivider = ({ flip = false }: { flip?: boolean }) => (
+  <div className={`overflow-hidden ${flip ? 'rotate-180' : ''}`}>
+    <svg viewBox="0 0 1440 150" className="w-full h-20">
+      <path
+        fill="#f3f4f6"
+        className="dark:fill-gray-800"
+        d="M0,64L48,80C96,96,192,128,288,122.7C384,117,480,75,576,64C672,53,768,75,864,106.7C960,139,1056,181,1152,186.7C1248,192,1344,160,1392,144L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
+      />
+    </svg>
+  </div>
+);
 
 export default function Home() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [skills, setSkills] = useState<Skill[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { isDark, toggleDarkMode } = useDarkMode();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [projectsRes, skillsRes] = await Promise.all([
           fetch('http://localhost:5000/api/projects'),
-          fetch('http://localhost:5000/api/skills')
+          fetch('http://localhost:5000/api/skills'),
         ]);
-        
+
         setProjects(await projectsRes.json());
         setSkills(await skillsRes.json());
       } catch (error) {
@@ -34,20 +48,31 @@ export default function Home() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
+      <div className="flex justify-center items-center min-h-screen dark:bg-black">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Hero Section */}
+    <div className="relative container mx-auto px-4 py-8">
+      {/* Dark Mode Toggle */}
+      <div className="fixed top-4 right-4 z-50">
+        <button
+          onClick={toggleDarkMode}
+          className="p-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-full shadow hover:scale-105 transition-all"
+          aria-label="Toggle Dark Mode"
+        >
+          {isDark ? '🌙' : '☀️'}
+        </button>
+      </div>
+
+      {/* Hero */}
       <AnimatedSection>
         <div className="relative overflow-hidden rounded-2xl">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 opacity-90"></div>
-          <div className="relative z-10 text-center py-20 px-4 sm:px-6 lg:px-8">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
+          <div className="relative z-10 text-center py-20">
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
               Benjamin Okumu Okinyi
             </h1>
             <p className="text-xl md:text-2xl text-blue-100 mb-8">
@@ -55,12 +80,21 @@ export default function Home() {
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <GradientButton
-                onClick={() => window.open('https://www.linkedin.com/in/benjamin-okumu-b947802b8/', '_blank')}
+                onClick={() =>
+                  window.open(
+                    'https://www.linkedin.com/in/benjamin-okumu-b947802b8/',
+                    '_blank'
+                  )
+                }
               >
                 Connect on LinkedIn
               </GradientButton>
               <button
-                onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+                onClick={() =>
+                  document.getElementById('contact')?.scrollIntoView({
+                    behavior: 'smooth',
+                  })
+                }
                 className="px-6 py-3 bg-white text-blue-600 rounded-full font-semibold hover:bg-gray-100 transition-all"
               >
                 Contact Me
@@ -69,6 +103,8 @@ export default function Home() {
           </div>
         </div>
       </AnimatedSection>
+
+      <SectionDivider />
 
       {/* About Section */}
       <AnimatedSection delay={0.2}>
