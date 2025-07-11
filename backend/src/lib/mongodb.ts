@@ -12,7 +12,7 @@ export async function connectToDatabase() {
   }
 
   try {
-    const db = await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost/portfolio');
+    const db = await mongoose.connect(process.env.MONGO_URI || 'mongodb+srv://benjaminokumu12:P2EBuvrWsZXZzf43@cluster0.uybmn.mongodb.net/portfolio');
     connection.isConnected = db.connections[0].readyState;
     console.log('MongoDB connected successfully');
     return db;
