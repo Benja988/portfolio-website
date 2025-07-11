@@ -1,22 +1,25 @@
-// backend/src/seedUser.ts
-import { connectToDatabase } from '../src/lib/mongodb';
-import User from '../src/models/User';
+import { connectToDatabase } from './lib/mongodb';
+import User from './models/User';
 
-async function seedUser() {
+export async function seedUser() {
   try {
     await connectToDatabase();
+
+    const existingUser = await User.findOne({ email: 'okumub85@gmail.com' });
+    if (existingUser) {
+      console.log('User already exists — deleting and recreating');
+      await User.deleteOne({ email: 'okumub85@gmail.com' });
+    }
+
     const user = new User({
       name: 'Benjamin Okumu',
       email: 'okumub85@gmail.com',
-      password: await import('bcryptjs').then(bcrypt => bcrypt.hashSync('Benja@4771', 10)),
+      password: 'Benja@4771',
     });
+
     await user.save();
-    console.log('User created successfully');
+    console.log('User seeded successfully');
   } catch (error) {
     console.error('Error seeding user:', error);
-  } finally {
-    process.exit();
   }
 }
-
-seedUser();
