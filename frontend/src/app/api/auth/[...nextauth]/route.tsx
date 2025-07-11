@@ -1,10 +1,8 @@
-// app/api/auth/[...nextauth]/page.tsx
+// app/api/auth/[...nextauth]/route.ts
 
-import { NextAuthOptions } from 'next-auth';
-import NextAuth from 'next-auth/next';
+import NextAuth, { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import axios from 'axios';
-import { NextRequest, NextResponse } from 'next/server';
 
 interface Credentials {
   email: string;
@@ -31,13 +29,20 @@ export const authOptions: NextAuthOptions = {
           });
 
           const user = response.data;
-          if (user) {
-            return { id: user.id, name: user.name, email: user.email, token: user.token };
+
+          if (user && user.token) {
+            return {
+              id: user.id,
+              name: user.name,
+              email: user.email,
+              token: user.token,
+            };
           }
+
           return null;
-        } catch (error) {
-          console.error('Auth error:', error);
-          throw new Error('Authentication failed');
+        } catch (error: any) {
+          console.error('Login error:', error?.response?.data || error.message);
+          throw new Error(error?.response?.data?.error || 'Invalid email or password');
         }
       },
     }),
@@ -47,7 +52,7 @@ export const authOptions: NextAuthOptions = {
   },
   session: {
     strategy: 'jwt',
-    maxAge: 30 * 24 * 60 * 60,
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   jwt: {
     secret: process.env.JWT_SECRET || 'your_jwt_secret',
@@ -61,12 +66,9 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      if (!session.user) session.user = {};
-      if (token.id) {
+      if (token && session.user) {
         session.user.id = token.id as string;
-      }
-      if (token.token) {
-        session.user.token = token.token as string;
+        (session.user as any).token = token.token;
       }
       return session;
     },
