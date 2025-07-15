@@ -11,6 +11,7 @@ import ProjectsSection from '../components/sections/ProjectsSection';
 import ExperienceSection from '../components/sections/ExperienceSection';
 import CertificationsSection from '../components/sections/CertificationsSection';
 import ContactSection from '../components/sections/ContactSection';
+import DarkModeToggle from '@/components/DarkModeToggle';
 
 export default function Home() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -52,6 +53,7 @@ export default function Home() {
 
   return (
     <div className="bg-white dark:bg-gray-900">
+     
       <HeroSection />
       
       <AnimatedSection>
